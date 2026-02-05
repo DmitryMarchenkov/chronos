@@ -1,0 +1,3 @@
+{
+  "app": "node dist/apps/infra/bin/infra.js"
+}

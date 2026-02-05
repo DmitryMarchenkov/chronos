@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  CONSULTANT
+  VIEWER
+}
+
+enum AssessmentType {
+  AI_ADOPTION
+  DIGITAL_TRANSFORMATION
+}
+
+enum AssessmentDomain {
+  STRATEGY
+  PROCESS
+  DATA
+  TECH
+  PEOPLE
+  GOVERNANCE
+  SECURITY
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  passwordHash String
+  members      WorkspaceMember[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Client {
+  id          String            @id @default(uuid())
+  name        String
+  members     WorkspaceMember[]
+  assessments Assessment[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model WorkspaceMember {
+  id        String   @id @default(uuid())
+  userId    String
+  clientId  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@unique([userId, clientId])
+  @@index([clientId])
+}
+
+model Assessment {
+  id          String                  @id @default(uuid())
+  clientId    String
+  type        AssessmentType
+  createdById String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id])
+  scores AssessmentDomainScore[]
+}
+
+model AssessmentDomainScore {
+  id           String           @id @default(uuid())
+  assessmentId String
+  domain       AssessmentDomain
+  score        Int
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id])
+
+  @@unique([assessmentId, domain])
+  @@index([assessmentId])
+}

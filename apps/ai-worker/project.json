@@ -1,0 +1,36 @@
+{
+  "name": "ai-worker",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/ai-worker",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "python -m compileall apps/ai-worker"
+      }
+    },
+    "serve": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "python -m uvicorn main:app --reload --port 8001",
+        "cwd": "apps/ai-worker"
+      }
+    },
+    "test": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "python -m unittest",
+        "cwd": "apps/ai-worker"
+      }
+    },
+    "lint": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "python -m compileall main.py",
+        "cwd": "apps/ai-worker"
+      }
+    }
+  }
+}

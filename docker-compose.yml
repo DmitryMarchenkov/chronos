@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: chronos-postgres
+    environment:
+      POSTGRES_USER: chronos
+      POSTGRES_PASSWORD: chronos
+      POSTGRES_DB: chronos
+    ports:
+      - '5432:5432'
+    volumes:
+      - chronos_pgdata:/var/lib/postgresql/data
+
+volumes:
+  chronos_pgdata:
