@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Account menu now routes to the settings page
+- Web UI refreshed with a green-accented, enterprise-inspired visual system
 
 ## [0.1.0] - 2026-02-04
 
