@@ -1,7 +1,8 @@
-import { FormEvent, MouseEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { FormEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { setToken } from '../auth';
+import logoUrl from '../../assets/chronos-logo.png';
 
 export const SignInPage = () => {
   const navigate = useNavigate();
@@ -10,18 +11,12 @@ export const SignInPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (
-    event: FormEvent | MouseEvent<HTMLButtonElement>,
-    mode: 'login' | 'register'
-  ) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      const response =
-        mode === 'login'
-          ? await api.login(email, password)
-          : await api.register(email, password);
+      const response = await api.login(email, password);
       setToken(response.token);
       navigate('/dashboard');
     } catch (err) {
@@ -32,11 +27,16 @@ export const SignInPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1>Sign in</h1>
-        <p className="muted">Chronos B2B delivery platform</p>
-        <form className="stack" onSubmit={(event) => submit(event, 'login')}>
+    <div className="auth-page auth-form-page">
+      <section className="auth-card">
+        <Link to="/" className="auth-logo-link">
+          <img src={logoUrl} alt="Chronos" />
+        </Link>
+        <div>
+          <h2>Sign in</h2>
+          <p className="muted">Use your Chronos credentials to continue.</p>
+        </div>
+        <form className="stack" onSubmit={submit}>
           <label>
             Email
             <input
@@ -60,17 +60,12 @@ export const SignInPage = () => {
             <button type="submit" disabled={busy}>
               Sign in
             </button>
-            <button
-              type="button"
-              className="ghost"
-              onClick={(event) => submit(event, 'register')}
-              disabled={busy}
-            >
+            <Link className="ghost-link" to="/register">
               Register
-            </button>
+            </Link>
           </div>
         </form>
-      </div>
+      </section>
     </div>
   );
 };

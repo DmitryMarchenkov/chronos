@@ -57,6 +57,7 @@ model WorkspaceMember {
   client Client @relation(fields: [clientId], references: [id])
 
   @@unique([userId, clientId])
+  @@index([userId])
   @@index([clientId])
 }
 
@@ -70,6 +71,8 @@ model Assessment {
 
   client Client @relation(fields: [clientId], references: [id])
   scores AssessmentDomainScore[]
+
+  @@index([clientId, createdAt])
 }
 
 model AssessmentDomainScore {
