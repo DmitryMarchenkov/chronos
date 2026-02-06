@@ -42,36 +42,6 @@ export const SettingsPage = () => {
       </div>
 
       <div className="card stack">
-        <div>
-          <h2>Notifications</h2>
-          <p className="muted">Control how Chronos communicates key updates.</p>
-        </div>
-        <div className="stack">
-          <label className="row">
-            <input type="checkbox" defaultChecked disabled />
-            <div>
-              <div>Weekly executive summary</div>
-              <div className="muted">Digest of assessment progress and risks.</div>
-            </div>
-          </label>
-          <label className="row">
-            <input type="checkbox" defaultChecked disabled />
-            <div>
-              <div>Client activity alerts</div>
-              <div className="muted">Immediate notifications for score changes.</div>
-            </div>
-          </label>
-          <label className="row">
-            <input type="checkbox" disabled />
-            <div>
-              <div>Monthly stakeholder report</div>
-              <div className="muted">Enterprise-ready PDF summary.</div>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div className="card stack">
         <div className="page-header">
           <div>
             <h2>Security</h2>

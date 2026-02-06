@@ -9,6 +9,8 @@
 - Use RBAC helpers from @chronos/shared-rbac.
 - Use the standard API error envelope: { "error": { "code": "STRING", "message": "STRING", "details"?: "ANY" } }.
 - Always update CHANGELOG.md when you do some changes.
+- When making structural changes (navigation, layout, routing, auth flow), update
+  new_screen_template.md to reflect the new rules.
 
 ## Architecture Rules
 

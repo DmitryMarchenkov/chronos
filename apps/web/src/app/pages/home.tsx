@@ -25,6 +25,7 @@ export const HomePage = () => {
               <span>My account</span>
             </summary>
             <div className="menu">
+              <Link to="/notifications">Notifications</Link>
               <Link to="/settings">Settings</Link>
               <button type="button" onClick={handleSignOut}>
                 Sign out

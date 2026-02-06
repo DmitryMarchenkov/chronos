@@ -9,11 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Account settings page with profile, notification, and security placeholders
+- Notifications page with preferences and activity placeholder
 
 ### Changed
 
 - Account menu now routes to the settings page
+- Account menu now links to notifications
 - Web UI refreshed with a green-accented, enterprise-inspired visual system
+- Notifications preferences moved from settings to notifications page
 
 ## [0.1.0] - 2026-02-04
 

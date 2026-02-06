@@ -40,6 +40,9 @@ export const AppLayout = () => {
             </summary>
             <div className="menu">
               <button type="button">Profile (coming soon)</button>
+              <button type="button" onClick={() => handleNavigate('/notifications')}>
+                Notifications
+              </button>
               <button type="button" onClick={() => handleNavigate('/settings')}>
                 Settings
               </button>
