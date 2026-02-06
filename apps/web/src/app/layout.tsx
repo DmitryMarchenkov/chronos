@@ -1,13 +1,22 @@
+import { useRef } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { clearToken } from './auth';
 import logoUrl from '../assets/chronos-logo.png';
 
 export const AppLayout = () => {
   const navigate = useNavigate();
+  const accountMenuRef = useRef<HTMLDetailsElement | null>(null);
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    if (accountMenuRef.current) {
+      accountMenuRef.current.open = false;
+    }
+  };
 
   const handleSignOut = () => {
     clearToken();
-    navigate('/sign-in');
+    handleNavigate('/sign-in');
   };
 
   return (
@@ -24,14 +33,16 @@ export const AppLayout = () => {
       <main className="content">
         <header className="app-topbar">
           <div className="app-topbar-title">Dashboard</div>
-          <details className="account-menu">
+          <details className="account-menu" ref={accountMenuRef}>
             <summary>
               <span className="account-avatar">CA</span>
               <span>My account</span>
             </summary>
             <div className="menu">
               <button type="button">Profile (coming soon)</button>
-              <button type="button">Team settings (coming soon)</button>
+              <button type="button" onClick={() => handleNavigate('/settings')}>
+                Settings
+              </button>
               <button type="button" onClick={handleSignOut}>
                 Sign out
               </button>

@@ -8,6 +8,7 @@
 - Enforce tenant scoping for every client-scoped API route.
 - Use RBAC helpers from @chronos/shared-rbac.
 - Use the standard API error envelope: { "error": { "code": "STRING", "message": "STRING", "details"?: "ANY" } }.
+- Always update CHANGELOG.md when you do some changes.
 
 ## Architecture Rules
 
