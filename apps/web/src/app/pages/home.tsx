@@ -1,7 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { clearToken, getToken } from '../auth';
 import logoUrl from '../../assets/chronos-logo.png';
 
 export const HomePage = () => {
+  const navigate = useNavigate();
+  const token = getToken();
+
+  const handleSignOut = () => {
+    clearToken();
+    navigate('/sign-in');
+  };
+
   return (
     <div className="home-page">
       <header className="home-top">
@@ -9,12 +18,28 @@ export const HomePage = () => {
           <img src={logoUrl} alt="Chronos" />
           <span>Chronos</span>
         </Link>
-        <nav className="home-actions">
-          <Link to="/sign-in">Sign in</Link>
-          <Link to="/register" className="primary">
-            Register
-          </Link>
-        </nav>
+        {token ? (
+          <details className="account-menu">
+            <summary>
+              <span className="account-avatar">CA</span>
+              <span>My account</span>
+            </summary>
+            <div className="menu">
+              <Link to="/notifications">Notifications</Link>
+              <Link to="/settings">Settings</Link>
+              <button type="button" onClick={handleSignOut}>
+                Sign out
+              </button>
+            </div>
+          </details>
+        ) : (
+          <nav className="home-actions">
+            <Link to="/sign-in">Sign in</Link>
+            <Link to="/register" className="primary">
+              Register
+            </Link>
+          </nav>
+        )}
       </header>
       <main className="home-shell">
         <section className="home-hero">
@@ -24,18 +49,46 @@ export const HomePage = () => {
             Chronos organizes client assessments, domain scoring, and secure
             collaboration for modern delivery teams.
           </p>
-          <div className="home-metadata">
+        </section>
+        <section className="home-sections">
+          <div className="home-section">
             <div>
-              <span className="meta-label">Security</span>
-              <span>Tenant-scoped access</span>
+              <h2>Delivery clarity at scale</h2>
+              <p className="muted">
+                Align on client outcomes with a trusted workspace that keeps every team,
+                score, and action visible.
+              </p>
             </div>
-            <div>
-              <span className="meta-label">Assessments</span>
-              <span>AI adoption + transformation</span>
+            <div className="home-metadata">
+              <div>
+                <span className="meta-label">Security</span>
+                <span>Tenant-scoped access</span>
+              </div>
+              <div>
+                <span className="meta-label">Assessments</span>
+                <span>AI adoption + transformation</span>
+              </div>
+              <div>
+                <span className="meta-label">Collaboration</span>
+                <span>Role-based permissions</span>
+              </div>
             </div>
+          </div>
+          <div className="home-section home-cta">
             <div>
-              <span className="meta-label">Collaboration</span>
-              <span>Role-based permissions</span>
+              <h2>Build a workspace that scales</h2>
+              <p className="muted">
+                Launch a new client program in minutes, then keep delivery signals
+                consistent across the portfolio.
+              </p>
+            </div>
+            <div className="row">
+              <Link to="/register" className="primary">
+                Start workspace
+              </Link>
+              <Link className="ghost-link" to="/sign-in">
+                Sign in
+              </Link>
             </div>
           </div>
         </section>

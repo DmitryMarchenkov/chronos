@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState, type SubmitEventHandler } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 
@@ -28,7 +28,7 @@ export const DashboardPage = () => {
     loadClients();
   }, []);
 
-  const createClient = async (event: FormEvent) => {
+  const createClient: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     if (!name.trim()) {
       return;

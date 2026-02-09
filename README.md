@@ -20,6 +20,8 @@ cp .env.example .env            || create local environment file
 npx prisma validate             || validate Prisma schema (preflight)
 npm run prisma:migrate          || apply database migrations
 npm run prisma:seed             || seed initial data
+npm run prisma:mock             || (optional) add mock data to make the app feel live
+npm run data:real               || (optional) fetch real client data + seed DB
 npx nx serve api                || start API (http://localhost:4000)
 npx nx serve web                || start Web UI (http://localhost:4200)
 
@@ -32,6 +34,8 @@ npx nx lint             || runs ESLint checks across the workspace (enforces cod
 npx nx graph            || opens the Nx dependency graph (understand project/library dependencies)
 npm run prisma:migrate  || applies Prisma migrations to the database (keeps DB schema in sync)
 npm run prisma:seed     || populates the database with initial/dev data (creates default local tenant/users/sample)
+npm run prisma:mock     || populates additional mock data (more workspaces/users/assessments)
+npm run data:real       || fetches real client data into DB + data/real-clients.json
 
 ## Repo Layout
 - `apps/web` React UI
