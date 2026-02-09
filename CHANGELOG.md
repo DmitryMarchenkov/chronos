@@ -10,6 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Account settings page with profile, notification, and security placeholders
 - Notifications page with preferences and activity placeholder
+- Data structure documentation for the Prisma schema
+- Mock data generator for local dev realism
+- Public data fetch script (HTML table -> JSON output)
+- Guardrails for external data ingestion (row limits)
+
+### Fixed
+
+- Real data parser now falls back to non-ID table detection
+- Real data script now seeds clients from a public companies table
 
 ### Changed
 

@@ -8,7 +8,9 @@
     "test": "nx test",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "prisma:mock": "ts-node prisma/mock.ts",
+    "data:real": "ts-node prisma/real-data.ts"
   },
   "private": true,
   "dependencies": {
@@ -19,6 +21,7 @@
     "@prisma/client": "^6.19.2",
     "argon2": "^0.44.0",
     "aws-cdk-lib": "^2.237.1",
+    "cheerio": "^1.2.0",
     "constructs": "^10.4.5",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.4",

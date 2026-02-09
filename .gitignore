@@ -27,6 +27,7 @@ tmp
 /coverage
 npm-debug.log
 yarn-error.log
+data/
 
 # System Files
 .DS_Store
