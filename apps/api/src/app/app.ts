@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
+import rateLimit from '@fastify/rate-limit';
 import sensible from '@fastify/sensible';
 import { ZodError } from 'zod';
 import { authRoutes } from '../routes/auth';
@@ -13,9 +14,48 @@ import { errorResponse, HttpError } from '../lib/errors';
 export interface AppOptions {}
 
 export async function app(fastify: FastifyInstance) {
-  fastify.register(cors, { origin: true });
+  const isProduction = process.env.NODE_ENV === 'production';
+  const jwtSecretFromEnv = process.env.JWT_SECRET;
+  if (isProduction && (!jwtSecretFromEnv || jwtSecretFromEnv.length < 32)) {
+    throw new Error('JWT_SECRET must be set and at least 32 characters in production');
+  }
+  const jwtSecret = jwtSecretFromEnv ?? 'dev-secret';
+
+  const configuredOrigins = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+  const allowedOrigins = isProduction
+    ? configuredOrigins
+    : configuredOrigins.length > 0
+      ? configuredOrigins
+      : ['http://localhost:4200', 'http://127.0.0.1:4200'];
+
+  if (isProduction && allowedOrigins.length === 0) {
+    throw new Error('CORS_ORIGINS must be configured in production');
+  }
+
+  fastify.register(cors, {
+    credentials: true,
+    origin: (origin, callback) => {
+      // Allow non-browser clients that do not send an Origin header.
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+  });
+  fastify.register(rateLimit, {
+    global: false,
+    keyGenerator: (request) => request.ip,
+  });
   fastify.register(jwt, {
-    secret: process.env.JWT_SECRET ?? 'dev-secret',
+    secret: jwtSecret,
     sign: { expiresIn: '12h' },
   });
   fastify.register(sensible);
@@ -23,7 +63,7 @@ export async function app(fastify: FastifyInstance) {
   fastify.decorate('authenticate', async (request, reply) => {
     try {
       await request.jwtVerify();
-    } catch (error) {
+    } catch {
       return reply.status(401).send(
         errorResponse({
           code: 'UNAUTHORIZED',

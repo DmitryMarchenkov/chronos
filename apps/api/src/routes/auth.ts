@@ -5,7 +5,16 @@ import { prisma } from '../lib/prisma';
 import { httpError } from '../lib/errors';
 
 export const authRoutes = async (fastify: FastifyInstance) => {
-  fastify.post('/register', async (request) => {
+  const authRateLimit = {
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: '1 minute',
+      },
+    },
+  } as const;
+
+  fastify.post('/register', authRateLimit, async (request) => {
     const payload = registerSchema.parse(request.body);
 
     const existing = await prisma.user.findUnique({
@@ -29,7 +38,7 @@ export const authRoutes = async (fastify: FastifyInstance) => {
     return { token, user: { id: user.id, email: user.email } };
   });
 
-  fastify.post('/login', async (request) => {
+  fastify.post('/login', authRateLimit, async (request) => {
     const payload = loginSchema.parse(request.body);
 
     const user = await prisma.user.findUnique({
