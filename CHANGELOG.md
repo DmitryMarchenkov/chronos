@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Added a baseline `ai-worker` unit test so `python3 -m unittest` no longer fails CI with "no tests ran"
+- Added real API security and auth behavior tests for bootstrap guards, JWT-protected routes, rate-limiting, and RBAC/tenant access guards
+
 ## [0.2.0] - 2026-02-10
 
 ### Added
