@@ -1,0 +1,301 @@
+{
+  "info": {
+    "name": "Chronos API",
+    "description": "Chronos application API. Run **Auth → Login** (or Register) first to get a token; it will be saved to the collection and used by other requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "clientId", "value": "" },
+    { "key": "assessmentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health & Root",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "Check API health. No authentication required."
+          }
+        },
+        {
+          "name": "Root",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "Root endpoint. Returns a simple message."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    if (pm.environment && pm.environment.set) pm.environment.set('token', json.token);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"your-email@example.com\",\n  \"password\": \"your-password\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register",
+            "description": "Register a new user. Use **No Auth** (not Basic Auth). Send email and password in the **Body** as JSON. Password: min 8, max 128 chars. Saves token to collection for subsequent requests."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    if (pm.environment && pm.environment.set) pm.environment.set('token', json.token);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"your-email@example.com\",\n  \"password\": \"your-password\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Login with email and password. Use **No Auth** (not Basic Auth). Send credentials in the **Body** as JSON. Saves token to collection for subsequent requests. For local dev, see project README for a seeded user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "List clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Page number (default 1)" },
+                { "key": "pageSize", "value": "20", "description": "Items per page (1–100, default 20)" }
+              ]
+            },
+            "description": "List clients the authenticated user is a member of. Paginated."
+          }
+        },
+        {
+          "name": "Create client",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('clientId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\"\n}"
+            },
+            "url": "{{baseUrl}}/clients",
+            "description": "Create a new client. Name: 2–120 chars. Caller becomes OWNER. Saves clientId to collection."
+          }
+        },
+        {
+          "name": "Get client by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/clients/{{clientId}}",
+            "description": "Get a single client. Requires membership."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Members",
+      "item": [
+        {
+          "name": "List client members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/{{clientId}}/members?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "{{clientId}}", "members"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "List members of a client. Requires membership. Paginated."
+          }
+        },
+        {
+          "name": "Add member",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new-member@example.com\",\n  \"role\": \"CONSULTANT\"\n}"
+            },
+            "url": "{{baseUrl}}/clients/{{clientId}}/members",
+            "description": "Add a member to the client. Role: OWNER | CONSULTANT | VIEWER. Caller must be OWNER. If user does not exist, they are created with a temporary password (returned in response)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assessments",
+      "item": [
+        {
+          "name": "List assessments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/{{clientId}}/assessments?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "{{clientId}}", "assessments"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "List assessments for a client. Paginated."
+          }
+        },
+        {
+          "name": "Create assessment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.id) pm.collectionVariables.set('assessmentId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"AI_ADOPTION\"\n}"
+            },
+            "url": "{{baseUrl}}/clients/{{clientId}}/assessments",
+            "description": "Create an assessment. Type: AI_ADOPTION | DIGITAL_TRANSFORMATION. Caller needs write role (OWNER or CONSULTANT). Saves assessmentId to collection."
+          }
+        },
+        {
+          "name": "Get assessment scores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/assessments/{{assessmentId}}/scores?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["assessments", "{{assessmentId}}", "scores"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "Get domain scores for an assessment. Domains: STRATEGY, PROCESS, DATA, TECH, PEOPLE, GOVERNANCE, SECURITY."
+          }
+        },
+        {
+          "name": "Update assessment scores",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scores\": [\n    { \"domain\": \"STRATEGY\", \"score\": 3, \"notes\": \"Optional notes\" },\n    { \"domain\": \"PROCESS\", \"score\": 2 },\n    { \"domain\": \"DATA\", \"score\": 4 },\n    { \"domain\": \"TECH\", \"score\": 1 },\n    { \"domain\": \"PEOPLE\", \"score\": 3 },\n    { \"domain\": \"GOVERNANCE\", \"score\": 2 },\n    { \"domain\": \"SECURITY\", \"score\": 4 }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/assessments/{{assessmentId}}/scores",
+            "description": "Update domain scores. Each score: domain (enum), score (0–5), notes (optional, max 2000 chars). Caller needs write role."
+          }
+        }
+      ]
+    }
+  ]
+}

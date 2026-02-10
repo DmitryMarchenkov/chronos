@@ -37,9 +37,13 @@ npm run prisma:seed     || populates the database with initial/dev data (creates
 npm run prisma:mock     || populates additional mock data (more workspaces/users/assessments)
 npm run data:real       || fetches real client data into DB + data/real-clients.json
 
+## API & Postman
+A Postman collection and local environment are in `postman/`. Import the collection and (optionally) the **Chronos Local** environment, then run **Auth → Login** (or Register) to get a token; other requests use it automatically. See [postman/README.md](postman/README.md) for details.
+
 ## Repo Layout
 - `apps/web` React UI
 - `apps/api` Fastify API
+- `postman/` Postman collection and environment for the API
 - `apps/infra` AWS CDK skeleton
 - `apps/ai-worker` Python placeholder
 - `libs/shared-*` shared types/validation/rbac
