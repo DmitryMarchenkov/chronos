@@ -1,4 +1,10 @@
-import { AssessmentDomain, AssessmentType, DomainScore } from '@chronos/shared-types';
+import {
+  AssessmentDomain,
+  AssessmentType,
+  DomainScore,
+  LeadStatus,
+  LeadSummary,
+} from '@chronos/shared-types';
 import { getToken } from './auth';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
@@ -48,6 +54,24 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
+  listLeads: async () => request<{ data: LeadSummary[] }>(`/leads`),
+  createLead: async (name: string, contact: string, source: string) =>
+    request<LeadSummary>(`/leads`, {
+      method: 'POST',
+      body: JSON.stringify({ name, contact, source }),
+    }),
+  updateLeadStatus: async (leadId: string, status: LeadStatus) =>
+    request<LeadSummary>(`/leads/${leadId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+  convertLead: async (leadId: string) =>
+    request<{ lead: LeadSummary; client: { id: string; name: string; createdAt: string } }>(
+      `/leads/${leadId}/convert`,
+      {
+        method: 'POST',
+      }
+    ),
   listClients: async () =>
     request<{ data: { id: string; name: string; createdAt: string }[] }>(`/clients`),
   createClient: async (name: string) =>

@@ -8,6 +8,7 @@ import { authRoutes } from '../routes/auth';
 import { clientRoutes } from '../routes/clients';
 import { assessmentRoutes } from '../routes/assessments';
 import { memberRoutes } from '../routes/members';
+import { leadRoutes } from '../routes/leads';
 import { errorResponse, HttpError } from '../lib/errors';
 
 /* eslint-disable-next-line */
@@ -131,6 +132,7 @@ export async function app(fastify: FastifyInstance) {
   fastify.get('/health', async () => ({ status: 'ok' }));
 
   fastify.register(authRoutes, { prefix: '/auth' });
+  fastify.register(leadRoutes, { prefix: '/leads' });
   fastify.register(clientRoutes, { prefix: '/clients' });
   fastify.register(memberRoutes, { prefix: '/clients' });
   fastify.register(assessmentRoutes);

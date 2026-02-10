@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/dashboard';
 import { ClientAssessmentPage } from './pages/client-assessment';
 import { SettingsPage } from './pages/settings';
 import { NotificationsPage } from './pages/notifications';
+import { LeadsPage } from './pages/leads';
 
 const ProtectedLayout = () => {
   const token = getToken();
@@ -24,6 +25,7 @@ export function App() {
       <Route path="/sign-in" element={<SignInPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<ProtectedLayout />}>
+        <Route path="/leads" element={<LeadsPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/clients/:clientId/assessment" element={<ClientAssessmentPage />} />
         <Route path="/settings" element={<SettingsPage />} />

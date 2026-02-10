@@ -21,6 +21,7 @@ npx prisma validate             || validate Prisma schema (preflight)
 npm run prisma:migrate          || apply database migrations
 npm run prisma:seed             || seed initial data
 npm run prisma:mock             || (optional) add mock data to make the app feel live
+npm run prisma:mock:leads       || (optional) create 5 mock leads for local testing
 npm run data:real               || (optional) fetch real client data + seed DB
 npx nx serve api                || start API (http://localhost:4000)
 npx nx serve web                || start Web UI (http://localhost:4200)
@@ -36,6 +37,7 @@ npx nx graph            || opens the Nx dependency graph (understand project/lib
 npm run prisma:migrate  || applies Prisma migrations to the database (keeps DB schema in sync)
 npm run prisma:seed     || populates the database with initial/dev data (creates default local tenant/users/sample)
 npm run prisma:mock     || populates additional mock data (more workspaces/users/assessments)
+npm run prisma:mock:leads || creates 5 leads for `owner@chronos.local` (idempotent)
 npm run data:real       || fetches real client data into DB + data/real-clients.json
 
 ## Security Configuration (Required for Deployment)

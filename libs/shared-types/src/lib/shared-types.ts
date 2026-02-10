@@ -19,6 +19,12 @@ export enum AssessmentDomain {
   SECURITY = 'SECURITY',
 }
 
+export enum LeadStatus {
+  NEW = 'NEW',
+  PROSPECTING = 'PROSPECTING',
+  CONVERTED = 'CONVERTED',
+}
+
 export type DomainScore = {
   domain: AssessmentDomain;
   score: number;
@@ -28,6 +34,15 @@ export type DomainScore = {
 export type ClientSummary = {
   id: string;
   name: string;
+  createdAt: string;
+};
+
+export type LeadSummary = {
+  id: string;
+  name: string;
+  contact: string;
+  source: string;
+  status: LeadStatus;
   createdAt: string;
 };
 

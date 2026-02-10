@@ -1,4 +1,4 @@
-import { AssessmentDomain, AssessmentType, Role } from './shared-types';
+import { AssessmentDomain, AssessmentType, LeadStatus, Role } from './shared-types';
 
 describe('shared-types', () => {
   it('exposes role enum values', () => {
@@ -11,5 +11,11 @@ describe('shared-types', () => {
     expect(AssessmentType.AI_ADOPTION).toBe('AI_ADOPTION');
     expect(AssessmentType.DIGITAL_TRANSFORMATION).toBe('DIGITAL_TRANSFORMATION');
     expect(Object.values(AssessmentDomain)).toContain('SECURITY');
+  });
+
+  it('exposes lead statuses', () => {
+    expect(LeadStatus.NEW).toBe('NEW');
+    expect(LeadStatus.PROSPECTING).toBe('PROSPECTING');
+    expect(LeadStatus.CONVERTED).toBe('CONVERTED');
   });
 });

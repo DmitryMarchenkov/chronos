@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "postinstall": "prisma generate",
     "prepare": "husky install",
     "lint": "nx run-many -t lint --all",
     "test": "nx run-many -t test --all",
@@ -11,6 +12,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed",
     "prisma:mock": "ts-node prisma/mock.ts",
+    "prisma:mock:leads": "ts-node prisma/mock-leads.ts",
     "data:real": "ts-node prisma/real-data.ts"
   },
   "private": true,

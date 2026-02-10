@@ -1,6 +1,38 @@
 export const api = {
   login: async () => ({ token: 'test-token' }),
   register: async () => ({ token: 'test-token' }),
+  listLeads: async () => ({ data: [] }),
+  createLead: async () => ({
+    id: 'lead-id',
+    name: 'Lead',
+    contact: 'lead@example.com',
+    source: 'Referral',
+    status: 'NEW',
+    createdAt: new Date().toISOString(),
+  }),
+  updateLeadStatus: async () => ({
+    id: 'lead-id',
+    name: 'Lead',
+    contact: 'lead@example.com',
+    source: 'Referral',
+    status: 'PROSPECTING',
+    createdAt: new Date().toISOString(),
+  }),
+  convertLead: async () => ({
+    lead: {
+      id: 'lead-id',
+      name: 'Lead',
+      contact: 'lead@example.com',
+      source: 'Referral',
+      status: 'CONVERTED',
+      createdAt: new Date().toISOString(),
+    },
+    client: {
+      id: 'client-id',
+      name: 'Lead',
+      createdAt: new Date().toISOString(),
+    },
+  }),
   listClients: async () => ({ data: [] }),
   createClient: async () => ({ id: 'client-id', name: 'Client' }),
   listAssessments: async () => ({ data: [] }),
