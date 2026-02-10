@@ -81,6 +81,25 @@ export async function app(fastify: FastifyInstance) {
       return;
     }
 
+    if (
+      typeof (error as { statusCode?: unknown }).statusCode === 'number' &&
+      (error as { statusCode: number }).statusCode >= 400 &&
+      (error as { statusCode: number }).statusCode < 500
+    ) {
+      const requestError = error as { statusCode: number; code?: string; message?: string };
+      const statusCode = (error as { statusCode: number }).statusCode;
+      const code = typeof requestError.code === 'string'
+        ? String(requestError.code)
+        : 'REQUEST_ERROR';
+      reply.status(statusCode).send(
+        errorResponse({
+          code,
+          message: requestError.message || 'Request failed',
+        })
+      );
+      return;
+    }
+
     if (error instanceof ZodError) {
       reply.status(400).send(
         errorResponse({
