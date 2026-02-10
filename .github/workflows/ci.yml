@@ -16,8 +16,6 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx nx lint
-      - run: npx nx test
-      - run: npx nx build api
-      - run: npx nx build web
-      - run: npx nx build infra
+      - run: npm run lint
+      - run: npm run test
+      - run: npx nx run-many -t build --projects=api,web,infra

@@ -29,17 +29,28 @@ Seeded user: `owner@chronos.local` / `password123`
 
 ## Useful Commands
 
-npx nx test             || runs unit tests for projects in the Nx workspace
-npx nx lint             || runs ESLint checks across the workspace (enforces code style)
+npm run test            || runs tests across all projects in the Nx workspace
+npm run lint            || runs ESLint checks across the workspace (enforces code style)
+npm run build           || builds all projects that define a build target
 npx nx graph            || opens the Nx dependency graph (understand project/library dependencies)
 npm run prisma:migrate  || applies Prisma migrations to the database (keeps DB schema in sync)
 npm run prisma:seed     || populates the database with initial/dev data (creates default local tenant/users/sample)
 npm run prisma:mock     || populates additional mock data (more workspaces/users/assessments)
 npm run data:real       || fetches real client data into DB + data/real-clients.json
 
+## Security Configuration (Required for Deployment)
+
+- Set a strong `JWT_SECRET` (32+ chars, high entropy).
+- Set explicit `CORS_ORIGINS` (comma-separated exact origins, no wildcard).
+- Do not deploy with local defaults from `.env.example`.
+
+## API & Postman
+A Postman collection and local environment are in `postman/`. Import the collection and (optionally) the **Chronos Local** environment, then run **Auth → Login** (or Register) to get a token; other requests use it automatically. See [postman/README.md](postman/README.md) for details.
+
 ## Repo Layout
 - `apps/web` React UI
 - `apps/api` Fastify API
+- `postman/` Postman collection and environment for the API
 - `apps/infra` AWS CDK skeleton
 - `apps/ai-worker` Python placeholder
 - `libs/shared-*` shared types/validation/rbac
