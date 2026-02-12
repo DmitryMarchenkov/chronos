@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: api-migrate-seed
+  namespace: chronos
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: api-migrate-seed
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate-seed
+          image: chronos-api:dev
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - npx prisma migrate deploy
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: JWT_SECRET
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: NODE_ENV
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: HOST
+            - name: API_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: API_PORT
+            - name: CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: CORS_ORIGINS
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_URL

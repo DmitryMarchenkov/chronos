@@ -1,6 +1,11 @@
 # Engineering Practices (Unified)
 
-This document is the single source of truth for Chronos engineering standards, security requirements, testing strategy, and delivery quality gates.
+This document is the normative source of engineering policy for Chronos. It defines coding principles, security standards, scalability patterns, and quality gates expected from every change.
+
+Interpretation keywords in this document:
+- **MUST** / **MUST NOT**: mandatory requirement.
+- **SHOULD** / **SHOULD NOT**: strong recommendation; deviation must be justified.
+- **MAY**: optional, context-dependent practice.
 
 ## 1) Scope and terminology
 
@@ -10,7 +15,7 @@ This document is the single source of truth for Chronos engineering standards, s
   - Workspace (PRD) = `Client` (implementation)
   - Workspace membership = `WorkspaceMember`
 
-All teams must keep this mapping explicit in code reviews and docs to avoid tenant-scope mistakes.
+All teams **MUST** keep this mapping explicit in code reviews and docs to avoid tenant-scope mistakes.
 
 ## 2) Canonical stack and architecture
 
@@ -25,169 +30,173 @@ All teams must keep this mapping explicit in code reviews and docs to avoid tena
 - AI worker: Python placeholder (`apps/ai-worker`)
 
 Non-negotiables:
-- Use Prisma for DB access (no raw SQL/extra ORM).
-- Keep tenant scoping enforced in API handlers and Prisma queries.
-- Keep RBAC enforcement server-side for all mutable operations.
+- Teams **MUST** use Prisma for DB access (no raw SQL or additional ORM layers).
+- Teams **MUST** enforce tenant scoping in API handlers and Prisma queries.
+- Teams **MUST** enforce RBAC server-side for all mutable operations.
 
-## 3) Core coding rules
+## 3) Engineering design principles
 
-- Use TypeScript for Node.js and React code.
-- Validate request **body, querystring, and params** with Zod schemas from `@chronos/shared-validation`.
-- Use `@chronos/shared-types` for shared enums/contracts.
-- Use `@chronos/shared-rbac` helpers for role checks.
-- Return API errors in standard envelope:
+These principles apply to API, web, and shared libraries:
+
+- **SOLID**
+  - Single Responsibility: each module has one reason to change.
+  - Open/Closed: extend behavior through composition/helpers before editing core flows.
+  - Liskov + Interface Segregation: shared contracts must be narrow and stable for consumers.
+  - Dependency Inversion: route handlers depend on service interfaces/helpers, not concrete infrastructure details.
+- **DRY**
+  - Teams **MUST** centralize repeated validation, RBAC checks, and shared contracts in `libs/shared-*`.
+  - Teams **MUST NOT** copy business rules across routes or pages; extract shared services/utilities.
+- **KISS**
+  - Teams **SHOULD** choose the simplest implementation that satisfies current functional and non-functional requirements.
+  - Teams **SHOULD** favor readable code paths over clever abstractions.
+- **YAGNI**
+  - Teams **SHOULD NOT** add framework layers, generic abstractions, or feature flags without a documented near-term use case and ADR approval in `docs/DECISIONS.md`.
+
+## 4) Code structure and boundaries
+
+### 4.1 Layer responsibilities
+
+- Route handlers **MUST** do input validation, authentication/authorization, orchestration, and response mapping only.
+- Service layer **MUST** own domain logic, policy decisions, and transactional workflows.
+- Repository/data layer **MUST** own Prisma queries and persistence details only.
+- Shared libraries **MUST** remain reusable and app-agnostic (no app-specific side effects).
+
+### 4.2 Dependency direction
+
+Allowed dependency flow:
+- `apps/web` -> API contracts only (no direct DB coupling).
+- `apps/api/routes` -> service layer -> repository layer.
+- Repository layer -> Prisma client.
+- Shared libraries **MAY** be depended on by all layers, but shared libraries **MUST NOT** depend on app-specific modules.
+
+### 4.3 Core coding rules
+
+- Teams **MUST** use TypeScript for Node.js and React code.
+- Teams **MUST** validate request body, querystring, and params with Zod schemas from `@chronos/shared-validation`.
+- Teams **MUST** use `@chronos/shared-types` for shared enums/contracts.
+- Teams **MUST** use `@chronos/shared-rbac` helpers for role checks.
+- APIs **MUST** return errors in standard envelope:
   - `{ "error": { "code": "STRING", "message": "STRING", "details"?: "ANY" } }`
-- For external data ingestion, always add guardrails (timeout, row limits, payload caps).
-- Update `CHANGELOG.md` for every merged change.
-- If changing navigation/layout/auth flow, also update `new_screen_template.md`.
+- For external data ingestion, teams **MUST** add guardrails (timeout, row limits, payload caps).
+- Teams **MUST** update `CHANGELOG.md` for every merged change.
+- If changing navigation/layout/auth flow, teams **MUST** also update `new_screen_template.md`.
 
-## 4) Security baseline
+## 5) Enterprise secure coding standard
 
-### 4.1 Tenant isolation and RBAC
+### 5.1 Tenant isolation and RBAC
 
 Must enforce:
-- Authenticated user must be a member of target workspace/client.
-- All reads are tenant-scoped by server-owned IDs.
-- All writes set tenant scope server-side only.
+- Authenticated user **MUST** be a member of target workspace/client.
+- All reads **MUST** be tenant-scoped by server-owned IDs.
+- All writes **MUST** set tenant scope server-side only.
 - Role matrix:
   - `OWNER`: full tenant access + member management
   - `CONSULTANT`: create/update assessments, no member management
   - `VIEWER`: read-only
 
-### 4.2 Authentication and secrets
+### 5.2 Authentication, sessions, and secrets
 
 Required practices:
-- Password hashing with Argon2 (already used).
-- Production `JWT_SECRET` must be mandatory and high entropy (no fallback defaults).
-- Token TTL must be explicit and reviewed.
-- Add brute-force protection on auth routes (rate limit + lockout/backoff).
+- Password hashing **MUST** use Argon2.
+- Production `JWT_SECRET` **MUST** be mandatory and high entropy (no fallback defaults).
+- Token TTL **MUST** be explicit and reviewed.
+- Auth routes **MUST** have brute-force protection (rate limit + lockout/backoff).
+- Teams **SHOULD** prefer HttpOnly, Secure, SameSite cookies for session tokens.
 
-### 4.3 API hardening
+### 5.3 API hardening
 
 Required practices:
-- Restrict CORS origins by environment (no open wildcard policy in production).
-- Validate route params with Zod, not only body/query.
-- Avoid resource existence leaks across tenants (prefer tenant-scoped query patterns returning neutral 404).
-- Never return bootstrap/temporary credentials in API responses.
+- CORS origins **MUST** be restricted by environment (no wildcard policy in production).
+- Teams **MUST** validate route params with Zod, not only body/query.
+- APIs **MUST** avoid resource existence leaks across tenants (prefer neutral 404 for unauthorized cross-tenant lookups).
+- APIs **MUST NOT** return bootstrap/temporary credentials in responses.
+- Services **MUST** redact secrets, tokens, and credential-like values from logs and error details.
 
-### 4.4 Frontend auth storage
+### 5.4 Dependency and supply-chain hygiene
 
-Current implementation stores JWT in `localStorage`, which increases XSS blast radius.
+- Teams **SHOULD** pin and review critical security dependencies.
+- CI **MUST** run vulnerability scanning and teams **MUST** triage findings by severity.
+- Teams **MUST** keep runtime/framework versions on supported release lines.
 
-Recommended direction:
-- Move to HttpOnly, Secure, SameSite cookies and short-lived access tokens.
-- If bearer token storage is retained temporarily, add strict CSP and harden all XSS vectors first.
+## 6) Scalability and reliability patterns
 
-## 5) Performance and scalability baseline
-
-- All list endpoints must be paginated (max page size enforced).
-- Add DB indexes for high-frequency filter/sort fields.
-- Keep query shape tenant-scoped and avoid N+1 queries.
-- Prefer server-side pagination in SQL/Prisma over in-memory slicing.
-- Add request timeout budgets and circuit breakers for external fetches.
-- Add observability:
+- All list endpoints **MUST** be paginated and enforce a max page size.
+- Teams **SHOULD** add DB indexes for high-frequency filter/sort fields.
+- Teams **MUST** keep query shape tenant-scoped and avoid N+1 queries.
+- Teams **MUST** prefer server-side pagination in SQL/Prisma over in-memory slicing.
+- Services **MUST** use explicit timeouts and retry budgets for outbound dependencies.
+- Mutable APIs exposed to retries **SHOULD** use idempotency keys or deterministic deduping.
+- Teams **SHOULD** define graceful degradation paths for non-critical external dependencies.
+- Teams **MUST** track observability signals:
   - request latency percentiles
   - error rate by endpoint
-  - DB query duration/slow-query alerts
+  - DB query duration and slow-query alerts
 
-## 6) Testing and quality gates
+## 7) Testing and quality gates
 
-### 6.1 Required coverage areas
+### 7.1 Required coverage areas
 
 - Unit tests:
   - `shared-validation` schemas
   - `shared-rbac` role logic
-  - auth utilities and error mappers
+  - auth/session utilities and error mappers
   - tenant-scope helper behavior
 - API integration tests:
   - auth flow
   - RBAC matrix by endpoint
   - tenant isolation on all scoped routes
+  - failure-path behavior (invalid input, rate limits, unauthorized access)
 - UI smoke tests:
   - sign-in
   - workspace/client list
   - assessment editor role-based behavior
 
-### 6.2 CI and execution standards
+### 7.2 CI and execution standards
 
-- CI must fail on lint/test/build failures.
-- PR checks should include at minimum:
+- CI **MUST** fail on lint, typecheck, test, or build failures.
+- PR checks **MUST** include at minimum:
   - lint
+  - typecheck
   - tests
   - build
-- Avoid stale command docs; keep repository commands executable as documented.
+- Teams **MUST** avoid stale command docs and keep repository commands executable as documented.
 
-## 7) Documentation standards
+## 8) Documentation standards
 
-- Keep `PRD.md`, `ARCHITECTURE.md`, `SECURITY.md`, and `TEST_STRATEGY.md` aligned with implementation.
-- Record important architectural choices in `docs/DECISIONS.md`.
-- Keep naming consistency explicit until full migration from `Client` to `Workspace` is completed (if migration chosen).
+- Teams **MUST** keep `PRD.md`, `ARCHITECTURE.md`, `SECURITY.md`, and `TEST_STRATEGY.md` aligned with implementation.
+- Teams **MUST** record important architectural and policy choices in `docs/DECISIONS.md`.
+- Teams **MUST** keep naming consistency explicit until full migration from `Client` to `Workspace` is completed.
+- This file **MUST** remain policy-oriented; implementation specifics belong in companion docs.
 
-## 8) Audit snapshot (2026-02-10)
+## 9) Clarification and approval protocol
 
-### What is implemented well
+- When this document is provided in chat, the implementing assistant **MUST** follow it as binding guidance.
+- Teams **MUST** ask clarifying questions before implementation when requirements, acceptance criteria, or scope are ambiguous.
+- Teams **MUST** ask for explicit approval before:
+  - architecture-impacting changes,
+  - security posture changes,
+  - database schema/migration changes,
+  - external dependency or framework additions.
+- If behavior or results are puzzling, contradictory, or risky, teams **MUST** pause and ask questions instead of making assumptions.
+- PR descriptions **MUST** document key assumptions and unresolved questions.
 
-- Tenant membership checks are present on protected client-scoped API routes.
-- RBAC checks are implemented for write/member-management paths.
-- Input validation exists for core request bodies and pagination.
-- Pagination and basic DB indexing are present for key list endpoints.
-- Standard error envelope is consistently used by API error handler.
+## 10) Code review checklist (mandatory)
 
-### High-priority findings
+Each PR reviewer **MUST** verify:
+- Tenant scope and RBAC are enforced server-side on all changed routes.
+- Validation exists for body/query/params and invalid input behavior is tested.
+- Business logic placement follows layer boundaries (route/service/repository).
+- No avoidable duplication; shared abstractions are used where appropriate.
+- Security controls are preserved (secret handling, logging redaction, auth hardening).
+- Scalability and reliability concerns are addressed (pagination, query efficiency, timeouts, retries).
+- Observability is sufficient for new critical paths.
+- Docs and changelog updates are included when behavior/contracts change.
+- Ambiguities and approvals were handled via explicit questions and documented decisions.
 
-1. **CI/test commands are not reliable as documented**
-   - `npx nx lint` and `npx nx test` fail at workspace level because target/project resolution is incomplete.
-   - `apps/ai-worker/project.json` uses `@nx/workspace:run-commands`, which is unresolved in current Nx setup.
-   - `web:test` fails (`TextEncoder is not defined`) in current Jest environment.
+## 11) Definition of done for compliance
 
-2. **Security hardening gaps**
-   - API accepts default JWT secret fallback.
-   - CORS is configured as `origin: true` (too permissive for production).
-   - No auth rate limiting / brute-force controls on login/register.
-   - Member invitation currently issues a static temporary password and returns it in API response.
-   - Web stores JWT in `localStorage` (elevated XSS impact).
-
-3. **Documentation-to-code drift**
-   - Docs require Zod validation for params; handlers currently cast params directly.
-   - Docs specify using shared RBAC helpers; API uses local role-check helpers instead.
-   - Test strategy expects substantial unit/integration coverage, but current suite is minimal.
-   - PRD states member management includes role changes/removal; routes currently provide list/add only.
-
-### Medium-priority findings
-
-- Assessment score read path paginates in memory after loading full score set.
-- Tenant/resource lookup pattern can still reveal resource existence in some flows (403 vs 404 behavior).
-- No explicit production security headers baseline (helmet/CSP/HSTS policy not yet codified).
-
-## 9) Prioritized remediation backlog
-
-### P0 (immediate)
-
-- Fix CI command reliability and align docs with real commands.
-- Repair web test environment (`TextEncoder` polyfill/setup).
-- Replace unresolved ai-worker executors with supported Nx executor.
-- Enforce required `JWT_SECRET` for non-dev environments.
-- Restrict production CORS origins.
-- Add auth rate limiting on `/auth/login` and `/auth/register`.
-
-### P1 (next sprint)
-
-- Stop returning temporary passwords from API; move to secure invite/reset flow.
-- Add Zod validation schemas for route params across all API handlers.
-- Consolidate role checks through `@chronos/shared-rbac`.
-- Add API integration tests for RBAC and tenant isolation scenarios.
-
-### P2 (near-term hardening)
-
-- Move web auth to HttpOnly cookie-based session model.
-- Add security headers and CSP policy.
-- Add structured observability and SLO-based alerting.
-- Revisit naming migration (`Client` -> `Workspace`) to reduce conceptual drift.
-
-## 10) Definition of done for compliance
-
-A change is compliant only when:
-- tenant scope + RBAC are enforced server-side,
+A change is compliant only when all conditions below are true:
+- tenant scope and RBAC are enforced server-side,
 - validation exists for body/query/params,
 - tests cover behavior and negative paths,
 - docs and changelog are updated,

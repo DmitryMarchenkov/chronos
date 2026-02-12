@@ -28,6 +28,75 @@ npx nx serve web                || start Web UI (http://localhost:4200)
 
 Seeded user: `owner@chronos.local` / `password123`
 
+## Local Kubernetes (k3d + Ingress)
+
+This repository includes local Kubernetes manifests in `k8s/` for:
+- `postgres` (stateful dev database)
+- `api` (Fastify + Prisma)
+- `web` (React static build served by Nginx)
+- `Ingress` routes:
+  - `http://chronos.local` -> web
+  - `http://api.chronos.local` -> api
+
+### 1) Create cluster
+
+```
+k3d cluster create chronos -p "80:80@loadbalancer" -p "443:443@loadbalancer"
+```
+
+### 2) Configure local hostnames
+
+Add this to `/etc/hosts`:
+
+```
+127.0.0.1 chronos.local api.chronos.local
+```
+
+### 3) Build images
+
+```
+docker build -t chronos-api:dev .
+docker build -f Dockerfile.web --build-arg VITE_API_URL=http://api.chronos.local -t chronos-web:dev .
+```
+
+### 4) Import images into k3d
+
+```
+k3d image import chronos-api:dev -c chronos
+k3d image import chronos-web:dev -c chronos
+```
+
+### 5) Deploy manifests
+
+```
+kubectl apply -k k8s
+kubectl wait --for=condition=complete job/api-migrate-seed -n chronos --timeout=180s
+kubectl rollout status deployment/postgres -n chronos
+kubectl rollout status deployment/api -n chronos
+kubectl rollout status deployment/web -n chronos
+```
+
+### 6) Verify deployment
+
+```
+kubectl get pods,svc,ingress -n chronos
+curl -H "Host: api.chronos.local" http://127.0.0.1/health
+curl -H "Host: chronos.local" http://127.0.0.1/
+curl -H "Host: api.chronos.local" -H "Content-Type: application/json" \
+  -d '{"email":"k3d-user@chronos.local","password":"password123"}' \
+  http://127.0.0.1/auth/register
+curl -H "Host: api.chronos.local" -H "Content-Type: application/json" \
+  -d '{"email":"k3d-user@chronos.local","password":"password123"}' \
+  http://127.0.0.1/auth/login
+```
+
+### 7) Teardown / reset
+
+```
+kubectl delete -k k8s
+k3d cluster delete chronos
+```
+
 ## Useful Commands
 
 npm run test            || runs tests across all projects in the Nx workspace
@@ -57,6 +126,9 @@ A Postman collection and local environment are in `postman/`. Import the collect
 - `apps/ai-worker` Python placeholder
 - `libs/shared-*` shared types/validation/rbac
 - `docs` product + engineering docs
+
+Useful docs:
+- `docs/DEBUGGING_PLAYBOOK.md` generic incident/error investigation workflow
 
 
 ## Nx Basics
