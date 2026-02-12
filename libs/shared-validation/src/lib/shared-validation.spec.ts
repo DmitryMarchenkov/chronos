@@ -2,12 +2,14 @@ import {
   addMemberSchema,
   createAssessmentSchema,
   createClientSchema,
+  createLeadSchema,
   loginSchema,
   paginationSchema,
   registerSchema,
+  updateLeadStatusSchema,
   updateScoresSchema,
 } from './shared-validation';
-import { AssessmentDomain, AssessmentType, Role } from '@chronos/shared-types';
+import { AssessmentDomain, AssessmentType, LeadStatus, Role } from '@chronos/shared-types';
 
 describe('shared-validation', () => {
   it('accepts valid auth payloads', () => {
@@ -33,8 +35,14 @@ describe('shared-validation', () => {
     ).toThrow();
   });
 
-  it('parses client, assessment, member, and pagination inputs', () => {
+  it('parses client, lead, assessment, member, and pagination inputs', () => {
     expect(createClientSchema.parse({ name: 'Acme' }).name).toBe('Acme');
+    expect(
+      createLeadSchema.parse({ name: 'Acme Lead', contact: 'owner@acme.com', source: 'Inbound' }).name
+    ).toBe('Acme Lead');
+    expect(updateLeadStatusSchema.parse({ status: LeadStatus.PROSPECTING }).status).toBe(
+      LeadStatus.PROSPECTING
+    );
     expect(createAssessmentSchema.parse({ type: AssessmentType.AI_ADOPTION }).type).toBe(
       AssessmentType.AI_ADOPTION
     );

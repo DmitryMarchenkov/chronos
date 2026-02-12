@@ -27,6 +27,7 @@ export const AppLayout = () => {
           <span>Chronos</span>
         </Link>
         <nav>
+          <Link to="/leads">Leads</Link>
           <Link to="/dashboard">Clients</Link>
         </nav>
       </aside>

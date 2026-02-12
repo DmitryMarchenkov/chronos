@@ -28,11 +28,18 @@ enum AssessmentDomain {
   SECURITY
 }
 
+enum LeadStatus {
+  NEW
+  PROSPECTING
+  CONVERTED
+}
+
 model User {
   id           String            @id @default(uuid())
   email        String            @unique
   passwordHash String
   members      WorkspaceMember[]
+  leads        Lead[]
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 }
@@ -88,4 +95,20 @@ model AssessmentDomainScore {
 
   @@unique([assessmentId, domain])
   @@index([assessmentId])
+}
+
+model Lead {
+  id          String     @id @default(uuid())
+  ownerId     String
+  name        String
+  contact     String
+  source      String
+  status      LeadStatus @default(NEW)
+  convertedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId, createdAt])
 }

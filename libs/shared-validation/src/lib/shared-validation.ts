@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   AssessmentDomain,
   AssessmentType,
+  LeadStatus,
   Role,
 } from '@chronos/shared-types';
 
@@ -20,6 +21,16 @@ export const loginSchema = z.object({
 
 export const createClientSchema = z.object({
   name: z.string().min(2).max(120),
+});
+
+export const createLeadSchema = z.object({
+  name: z.string().min(2).max(120),
+  contact: z.string().min(2).max(120),
+  source: z.string().min(2).max(80),
+});
+
+export const updateLeadStatusSchema = z.object({
+  status: z.enum(LeadStatus),
 });
 
 export const createAssessmentSchema = z.object({
@@ -49,6 +60,8 @@ export const paginationSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CreateClientInput = z.infer<typeof createClientSchema>;
+export type CreateLeadInput = z.infer<typeof createLeadSchema>;
+export type UpdateLeadStatusInput = z.infer<typeof updateLeadStatusSchema>;
 export type CreateAssessmentInput = z.infer<typeof createAssessmentSchema>;
 export type UpdateScoresInput = z.infer<typeof updateScoresSchema>;
 export type AddMemberInput = z.infer<typeof addMemberSchema>;

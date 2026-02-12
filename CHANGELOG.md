@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Leads management flow in authenticated dashboard, including route/navigation, list/create/status updates, and lead-to-client conversion
+- Tenant-scoped API endpoints and shared validation/contracts for leads
+- Dedicated Prisma mock script to generate 5 leads for local testing (`npm run prisma:mock:leads`)
+
 ### Fixed
 
 - Added a baseline `ai-worker` unit test so `python3 -m unittest` no longer fails CI with "no tests ran"
