@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Leads management flow in authenticated dashboard, including route/navigation, list/create/status updates, and lead-to-client conversion
 - Tenant-scoped API endpoints and shared validation/contracts for leads
 - Dedicated Prisma mock script to generate 5 leads for local testing (`npm run prisma:mock:leads`)
+- Root multi-stage Dockerfile and `.dockerignore` for containerized API build/run workflow
 
 ### Fixed
 
