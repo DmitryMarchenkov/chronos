@@ -58,6 +58,9 @@ A Postman collection and local environment are in `postman/`. Import the collect
 - `libs/shared-*` shared types/validation/rbac
 - `docs` product + engineering docs
 
+Useful docs:
+- `docs/DEBUGGING_PLAYBOOK.md` generic incident/error investigation workflow
+
 
 ## Nx Basics
 
