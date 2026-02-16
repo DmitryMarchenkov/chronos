@@ -52,6 +52,10 @@ export const addMemberSchema = z.object({
   role: z.nativeEnum(Role),
 });
 
+export const clientAiChatSchema = z.object({
+  message: z.string().min(1).max(4000),
+});
+
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
@@ -65,4 +69,5 @@ export type UpdateLeadStatusInput = z.infer<typeof updateLeadStatusSchema>;
 export type CreateAssessmentInput = z.infer<typeof createAssessmentSchema>;
 export type UpdateScoresInput = z.infer<typeof updateScoresSchema>;
 export type AddMemberInput = z.infer<typeof addMemberSchema>;
+export type ClientAiChatInput = z.infer<typeof clientAiChatSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;

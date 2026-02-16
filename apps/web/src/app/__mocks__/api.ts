@@ -39,4 +39,11 @@ export const api = {
   createAssessment: async () => ({ id: 'assessment-id' }),
   getScores: async () => ({ data: [] }),
   updateScores: async () => ({ data: [] }),
+  getClientAiSummary: async () => ({
+    source: 'wikipedia',
+    title: 'Test client',
+    extract: 'Not specified',
+    url: null,
+  }),
+  sendClientAiChat: async () => ({ reply: 'Test reply' }),
 };

@@ -11,6 +11,17 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
 type ApiError = { code: string; message: string; details?: unknown };
 
+export type ClientAiSummary = {
+  source: 'wikipedia';
+  title?: string | null;
+  extract?: string | null;
+  url?: string | null;
+};
+
+export type ClientAiChatResponse = {
+  reply: string;
+};
+
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (response.ok) {
     return (await response.json()) as T;
@@ -100,4 +111,12 @@ export const api = {
         body: JSON.stringify({ scores }),
       }
     ),
+
+  getClientAiSummary: async (clientId: string) =>
+    request<ClientAiSummary>(`/clients/${clientId}/ai/summary`),
+  sendClientAiChat: async (clientId: string, message: string) =>
+    request<ClientAiChatResponse>(`/clients/${clientId}/ai/chat`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
 };
