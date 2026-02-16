@@ -9,6 +9,7 @@ import { clientRoutes } from '../routes/clients';
 import { assessmentRoutes } from '../routes/assessments';
 import { memberRoutes } from '../routes/members';
 import { leadRoutes } from '../routes/leads';
+import { aiRoutes } from '../routes/ai';
 import { errorResponse, HttpError } from '../lib/errors';
 
 /* eslint-disable-next-line */
@@ -135,5 +136,6 @@ export async function app(fastify: FastifyInstance) {
   fastify.register(leadRoutes, { prefix: '/leads' });
   fastify.register(clientRoutes, { prefix: '/clients' });
   fastify.register(memberRoutes, { prefix: '/clients' });
+  fastify.register(aiRoutes, { prefix: '/clients' });
   fastify.register(assessmentRoutes);
 }

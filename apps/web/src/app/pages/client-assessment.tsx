@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AssessmentDomain, AssessmentType, DomainScore } from '@chronos/shared-types';
 import { api } from '../api';
+import { AIChatWidget } from '../components/ai-chat/AIChatWidget';
 
 type ScoreRow = {
   id: string;
@@ -178,6 +179,14 @@ export const ClientAssessmentPage = () => {
             </tbody>
           </table>
         </div>
+      ) : null}
+
+      {clientId ? (
+        <AIChatWidget
+          clientId={clientId}
+          getSummary={api.getClientAiSummary}
+          sendChat={api.sendClientAiChat}
+        />
       ) : null}
     </div>
   );

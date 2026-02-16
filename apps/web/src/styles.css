@@ -460,6 +460,125 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.ai-chat-root {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+}
+
+.ai-chat-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+  padding: 0;
+}
+
+.ai-chat-panel {
+  width: min(420px, calc(100vw - 48px));
+  height: min(520px, calc(100vh - 120px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.ai-chat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ai-chat-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.ai-chat-subtitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.ai-chat-icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #1c1f1a;
+  display: grid;
+  place-items: center;
+}
+
+.ai-chat-icon-button:hover {
+  background: #f3f2eb;
+}
+
+.ai-chat-context {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.ai-chat-context a {
+  text-decoration: underline;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 2px;
+}
+
+.ai-chat-message {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.ai-chat-message-user {
+  justify-content: flex-end;
+}
+
+.ai-chat-bubble {
+  max-width: 90%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+  white-space: pre-wrap;
+}
+
+.ai-chat-message-user .ai-chat-bubble {
+  background: #1f8f4a;
+  color: #ffffff;
+  border-color: #1f8f4a;
+}
+
+.ai-chat-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ai-chat-input-row input {
+  flex: 1;
+}
+
 .error {
   padding: 10px 12px;
   border-radius: 8px;
